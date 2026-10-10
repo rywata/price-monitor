@@ -1,5 +1,10 @@
 # Price Monitor
 
+![Python](https://img.shields.io/badge/python-3.11+-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
+![Commits](https://img.shields.io/github/commit-activity/m/rywata/price-monitor)
+
 Monitor de preços resiliente para e-commerce, com coleta via APIs
 oficiais e endpoints públicos, retry inteligente, rate limiting e
 exportação estruturada.
