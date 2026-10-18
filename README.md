@@ -49,3 +49,21 @@ source .venv/bin/activate          # Linux/Mac
 
 # 3. Instale em modo editável
 pip install -e ".[dev]"
+
+# 4. Rode a CLI
+price-monitor --help
+price-monitor --arquivo data/produtos.csv
+
+
+## Decisão: CLI com comando único
+
+**Contexto:** projeto tem apenas 1 comando (`coletar`).
+
+**Decisão:** usar modo "single command" do Typer (sem subcomando `coletar`).
+Uso: `price-monitor --arquivo X`
+
+**Consequência:** quando o projeto ganhar um segundo comando
+(status, configurar, etc.), refatorar para modo grupo.
+Uso passará a ser: `price-monitor coletar --arquivo X`.
+
+**Data:** 2026-10-18
