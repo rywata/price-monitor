@@ -10,9 +10,12 @@ from rich.table import Table
 from price_monitor.config import settings
 from price_monitor.http_client import HttpClient
 from price_monitor.models import Price, Product
+from price_monitor.scrapers.base import BaseScraper
+from price_monitor.scrapers.shopify import ShopifyScraper
 
 app = typer.Typer(help="Monitor de precos para e-commerce.")
 console = Console()
+
 
 def setup_logging() -> None:
     """Configura loguru para terminal colorido + arquivo rotativo."""
@@ -32,6 +35,7 @@ def setup_logging() -> None:
         retention="30 days",
         encoding="utf-8",
     )
+
 
 def carregar_produtos(arquivo: Path) -> list[Product]:
     """Le um CSV de produtos e valida com pydantic."""
@@ -54,15 +58,38 @@ def carregar_produtos(arquivo: Path) -> list[Product]:
 
     return produtos
 
+
+def _criar_scrapers(client: HttpClient) -> dict[str, BaseScraper]:
+    """Instancia todos os scrapers disponiveis, indexados por site."""
+    scrapers: list[BaseScraper] = [
+        ShopifyScraper(client),
+        # MercadoLivreScraper(client),  # descomente quando tiver credenciais
+    ]
+    return {s.site_name: s for s in scrapers}
+
+
 async def coletar_precos(produtos: list[Product]) -> list[Price]:
-    """Roda todos os scrapers em paralelo com rate limit compartilhado."""
+    """Roda todos os scrapers em paralelo (com rate limit compartilhado)."""
     precos: list[Price] = []
 
     async with HttpClient() as client:
+        scrapers = _criar_scrapers(client)
+
         for produto in produtos:
-            logger.info(f"Processando: {produto.nome} ({produto.site})")
+            scraper = scrapers.get(produto.site)
+            if not scraper:
+                logger.warning(
+                    f"Site sem scraper registrado: {produto.site} " f"(produto {produto.id})"
+                )
+                continue
+
+            price = await scraper.fetch_price(produto)
+            if price is not None:
+                precos.append(price)
+                logger.success(f"[{produto.site}] {produto.id}: R$ {price.price:.2f}")
 
     return precos
+
 
 def exibir_resultados(precos: list[Price]) -> None:
     """Mostra os precos coletados em tabela colorida."""
@@ -86,6 +113,7 @@ def exibir_resultados(precos: list[Price]) -> None:
 
     console.print(table)
 
+
 def salvar_resultados(precos: list[Price]) -> None:
     """Salva os precos coletados em CSV."""
     if not precos:
@@ -100,9 +128,10 @@ def salvar_resultados(precos: list[Price]) -> None:
     df.to_csv(saida, index=False, encoding="utf-8")
     logger.success(f"{len(precos)} precos salvos em {saida}")
 
-@app.command()
+
+@app.command()  # type: ignore[misc]
 def coletar(
-    arquivo: Path = typer.Option(
+    arquivo: Path = typer.Option(  # noqa: B008
         ...,
         "--arquivo",
         "-a",
@@ -122,6 +151,7 @@ def coletar(
     salvar_resultados(precos)
 
     logger.success("Coleta finalizada.")
+
 
 if __name__ == "__main__":
     app()

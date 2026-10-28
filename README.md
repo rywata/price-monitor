@@ -34,6 +34,22 @@ transformando dados brutos em inteligência acionável.
 - **CLI:** `typer` + `rich`
 - **Dados:** `pandas`
 - **Testes:** `pytest` + `respx`
+- **Qualidade:** `ruff` + `mypy` + `pre-commit`
+
+## 📋 Status
+
+- [x] Estrutura inicial do projeto
+- [x] Ambiente e dependências
+- [x] Configuração centralizada (`pydantic-settings`)
+- [x] Modelos de dados (`pydantic`)
+- [x] Cliente HTTP resiliente (retry + rate limit)
+- [x] CLI com comando `coletar`
+- [x] Qualidade de código (ruff, mypy, pre-commit)
+- [ ] Scraper Mercado Livre (API)          ← próximo
+- [ ] Scraper Shopify (JSON)               ← próximo
+- [ ] Export CSV com dados reais
+- [ ] Testes automatizados
+- [ ] CI/CD (GitHub Actions)
 
 ## 🚀 Como rodar
 
@@ -53,17 +69,3 @@ pip install -e ".[dev]"
 # 4. Rode a CLI
 price-monitor --help
 price-monitor --arquivo data/produtos.csv
-
-
-## Decisão: CLI com comando único
-
-**Contexto:** projeto tem apenas 1 comando (`coletar`).
-
-**Decisão:** usar modo "single command" do Typer (sem subcomando `coletar`).
-Uso: `price-monitor --arquivo X`
-
-**Consequência:** quando o projeto ganhar um segundo comando
-(status, configurar, etc.), refatorar para modo grupo.
-Uso passará a ser: `price-monitor coletar --arquivo X`.
-
-**Data:** 2026-10-18
