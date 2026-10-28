@@ -45,11 +45,23 @@ transformando dados brutos em inteligência acionável.
 - [x] Cliente HTTP resiliente (retry + rate limit)
 - [x] CLI com comando `coletar`
 - [x] Qualidade de código (ruff, mypy, pre-commit)
-- [ ] Scraper Mercado Livre (API)          ← próximo
-- [ ] Scraper Shopify (JSON)               ← próximo
-- [ ] Export CSV com dados reais
+- [x] Scraper Shopify (com fallback de catálogo)   ← novo
+- [ ] Scraper Mercado Livre (API)
 - [ ] Testes automatizados
 - [ ] CI/CD (GitHub Actions)
+
+
+## 📊 Exemplo de saída
+
+```bash
+$ price-monitor --arquivo data/produtos.csv
+
+         Precos Coletados
+┏━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Site    ┃ Produto     ┃    Preco ┃ Disponivel ┃
+┡━━━━━━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━┩
+│ shopify │ qualquer-id │ R$ 39.00 │     ❌     │
+└─────────┴─────────────┴──────────┴────────────┘
 
 ## 🚀 Como rodar
 
